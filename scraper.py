@@ -14,8 +14,8 @@ if len(sys.argv) < 3:
 link = sys.argv[1]
 board = link.split('/')[3]    # 'tv', 'wg', or similar
 thread_id = link.split('/')[5]    # '114804039' or similar
-url = 'https://a.4cdn.org/' + board + '/thread/' + thread_id + '.json'
-content_url = 'https://i.4cdn.org/' + board + '/'
+url = f'https://a.4cdn.org/{board}/thread/{thread_id}.json'
+content_url = f'https://i.4cdn.org/{board}/'
 
 # Set destination folder:
 system = platform.system()
@@ -53,15 +53,13 @@ for post in posts['posts']:
         image = ''.join([str(post['tim']), post['ext']])
         images.append(image)
 
-print('Starting download at: %s, it will take approx %s seconds' %
-      (time.ctime(), len(images)))
-
 # Parse the images list and download each with 1 second wait time (4chan API rules)
+print(f'Starting download at: {time.ctime()}, it will take approx {len(images)} seconds')
 for image in images:
     imageurl = content_url + image
     target = destination + '/' + image
 
-    print('\tDownloading: %s' % imageurl)
+    print(f'\tDownloading: {imageurl}')
     try:
         r = requests.get(imageurl, stream=True)
         downloaded_file = open(target, 'wb')
@@ -69,8 +67,8 @@ for image in images:
             if chunk:
                 downloaded_file.write(chunk)
     except requests.exceptions.RequestException as e:
-        print('Could not download file, error: ', e)
+        print(f'Could not download file, error: {e}')
 
     time.sleep(1)
 
-print('Download complete at: %s' % time.ctime())
+print(f'Download complete at: {time.ctime()}')
