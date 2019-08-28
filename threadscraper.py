@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import platform
 import sys
@@ -19,6 +19,8 @@ def main():
                         action='store_true', default=False)
     parser.add_argument('-w', '--watch', help='Watch the thread, will check thread every 5 minutes for new posts until thread 404s',
                         action='store_true', default=False)
+    parser.add_argument('-i', '--interval', help='Specify the wait-time when watching a thread in seconds', type=int)
+
     parser.add_argument(
         'url', help='URL to the 4chan thread you want to scrape', type=str)
     parser.add_argument(
@@ -34,6 +36,9 @@ def main():
     verbose = args.verbose
     quiet = args.quiet
     watch = args.watch
+    interval = 300
+    if args.interval:
+        interval = args.interval
 
     # Set variables
     link = args.url
@@ -119,7 +124,9 @@ def main():
         if not quiet:
             print('--- watching thread ---')
         while True:
-            time.sleep(5)
+            if verbose:
+                print(f'--> waiting {timedelta(seconds=interval)} before refreshing thread')
+            time.sleep(interval)
 
             if verbose:
                 print('--> refreshing list of posts')
