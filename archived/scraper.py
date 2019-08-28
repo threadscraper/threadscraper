@@ -3,7 +3,6 @@ import requests
 import sys
 import time
 import os
-import getpass
 import platform
 
 if len(sys.argv) < 3:
