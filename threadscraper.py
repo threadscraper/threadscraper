@@ -9,28 +9,32 @@ import time
 from scrape import scraper
 from refresh import refresh_post_list
 
+
 def main():
     parser = argparse.ArgumentParser()
 
-    # parser.add_argument('', help='', type=str)
-    parser.add_argument('-q', '--quiet', help='Run the script in quiet mode, no outputs',
-                        action='store_true', default=False)
-    parser.add_argument('-v', '--verbose', help='Run with increased verbosity',
-                        action='store_true', default=False)
-    parser.add_argument('-w', '--watch', help='Watch the thread, will check thread every 5 minutes for new posts until thread 404s',
-                        action='store_true', default=False)
-    parser.add_argument('-i', '--interval', help='Specify the wait-time when watching a thread in seconds', type=int)
+    # Positional arguments
+    parser.add_argument('url', help='URL to the 4chan thread you want to scrape', type=str)
+    parser.add_argument('destination', help='Destination folder in your home folder', type=str)
 
-    parser.add_argument(
-        'url', help='URL to the 4chan thread you want to scrape', type=str)
-    parser.add_argument(
-        'destination', help='Destination folder in your home folder', type=str)
+    # Optional arguments
+    parser.add_argument('-q', '--quiet',
+                        help='Run the script in quiet mode, no outputs',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('-v', '--verbose',
+                        help='Run with increased verbosity',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('-w', '--watch',
+                        help='Watch the thread, will check thread every 5 minutes for new posts until thread 404s',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('-i', '--interval',
+                        help='Specify the wait-time when watching a thread in seconds',
+                        type=int)
 
     args = parser.parse_args()
-
-    if args.url is None:
-        print('URL is missing, exiting')
-        sys.exit(1)
 
     # Set behaviour:
     verbose = args.verbose
@@ -49,21 +53,16 @@ def main():
     content_url = f'https://i.4cdn.org/{board}/'
 
     # Determine platform/OS and set appropriate path
-    if not destination:
-        if not quiet:
-            print('No destination folder given, exiting')
-        sys.exit(2)
+    system = platform.system()
+    if system == 'Linux':
+        home = os.environ['HOME']
+    elif system == 'Windows':
+        home == os.environ['HOMEPATH']
     else:
-        system = platform.system()
-        if system == 'Linux':
-            home = os.environ['HOME']
-        elif system == 'Windows':
-            home == os.environ['HOMEPATH']
-        else:
-            if not quiet:
-                print('Unsupported system, exiting')
-            sys.exit(3)
-        destination = f'{home}/{destination}'
+        if not quiet:
+            print('Unsupported system, exiting')
+        sys.exit(2)
+    destination = f'{home}/{destination}'
 
     if verbose:
         print('Will scrape using the following information:')
@@ -83,7 +82,7 @@ def main():
     except Exception as e:
         if not quiet:
             print(f'Could not create destination folder: {e}')
-        sys.exit(4)
+        sys.exit(3)
 
     # Get the thread in JSON-representation:
     try:
@@ -93,7 +92,7 @@ def main():
     except Exception as e:
         if not quiet:
             print(f'Could not get thread metadata, reason: {e}')
-        sys.exit(5)
+        sys.exit(4)
 
     # Set timestamp
     start_time = posts[0]['time']
@@ -107,7 +106,8 @@ def main():
             title = None
         no_of_images = first_post['images']
         no_of_replies = first_post['replies']
-        time_of_first_post = datetime.utcfromtimestamp(start_time).strftime('%Y-%m-%d %H:%M:%S')
+        time_of_first_post = datetime.utcfromtimestamp(
+            start_time).strftime('%Y-%m-%d %H:%M:%S')
 
         print('--> metainformation about the thread:')
         if title:
@@ -116,7 +116,8 @@ def main():
         print(f'\tNumber of replies: {no_of_replies}')
         print(f'\tTime of first post: {time_of_first_post} UTC')
 
-    new_time = scraper(posts, start_time, content_url, destination, quiet, verbose)
+    new_time = scraper(posts, start_time, content_url,
+                       destination, quiet, verbose)
     if verbose:
         print(f'--> timestamp of last post: {new_time}')
 
@@ -140,9 +141,11 @@ def main():
                     break
             if verbose:
                 print('--> attempting to download new images')
-            new_time = scraper(posts, new_time, content_url, destination, quiet, verbose)
+            new_time = scraper(posts, new_time, content_url,
+                               destination, quiet, verbose)
 
     print('All images are downloaded, goodbye.')
+
 
 if __name__ == '__main__':
     main()

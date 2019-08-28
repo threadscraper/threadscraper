@@ -2,13 +2,14 @@
 import requests
 import time
 
+
 def scraper(posts: list,
-           start_time: int,
-           content_url: str,
-           destination: str,
-           quiet: bool,
-           verbose: bool,
-           ) -> int:
+            start_time: int,
+            content_url: str,
+            destination: str,
+            quiet: bool,
+            verbose: bool,
+            ) -> int:
     # Create list of images from start_time
     images = []
     if verbose:
