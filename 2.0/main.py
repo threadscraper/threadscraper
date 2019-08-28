@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-import sys
-import os
 import argparse
-import platform
-import requests
 from datetime import datetime
+import os
+import platform
+import sys
+import time
 
+from scrape import scraper
+from refresh import refresh_post_list
 
 def main():
     parser = argparse.ArgumentParser()
@@ -79,31 +81,61 @@ def main():
         sys.exit(4)
 
     # Get the thread in JSON-representation:
-    if verbose:
-        print(f'--> getting the thread metadata from thread id: {board}/{thread_id}')
-    resp = requests.get(url)
     try:
-        resp.raise_for_status()
-    except Exception as exc:
+        if verbose:
+            print(f'--> getting the thread metadata from thread id: {board}/{thread_id}')
+        posts = refresh_post_list(url, quiet, verbose)
+    except Exception as e:
         if not quiet:
             print(f'Could not get thread metadata, reason: {e}')
         sys.exit(5)
 
+    # Set timestamp
+    start_time = posts[0]['time']
+
     # Provide more verbose information about the thread:
     if verbose:
-        posts = resp.json()
-        first_post = posts['posts'][0]
-        title = first_post['sub']
+        first_post = posts[0]
+        if first_post.get('sub'):
+            title = first_post['sub']
+        else:
+            title = None
         no_of_images = first_post['images']
         no_of_replies = first_post['replies']
-        time_of_first_post = datetime.utcfromtimestamp(first_post['time']).strftime('%Y-%m-%d %H:%M:%S')
+        time_of_first_post = datetime.utcfromtimestamp(start_time).strftime('%Y-%m-%d %H:%M:%S')
 
         print('--> metainformation about the thread:')
-        if title != '':
+        if title:
             print(f'\tTitle: {title}')
         print(f'\tNumber of images: {no_of_images}')
         print(f'\tNumber of replies: {no_of_replies}')
         print(f'\tTime of first post: {time_of_first_post} UTC')
+
+    new_time = scraper(posts, start_time, content_url, destination, quiet, verbose)
+    if verbose:
+        print(f'--> timestamp of last post: {new_time}')
+
+    if watch:
+        if not quiet:
+            print('--- watching thread ---')
+        while True:
+            time.sleep(5)
+
+            if verbose:
+                print('--> refreshing list of posts')
+            posts = refresh_post_list(url, quiet, verbose)
+
+            # Check if thread is closed:
+            if posts[0].get('closed'):
+                if posts[0]['closed']:
+                    if not quiet:
+                        print('Thread is closed, exiting')
+                    break
+            if verbose:
+                print('--> attempting to download new images')
+            new_time = scraper(posts, new_time, content_url, destination, quiet, verbose)
+
+    print('All images are downloaded, goodbye.')
 
 if __name__ == '__main__':
     main()
