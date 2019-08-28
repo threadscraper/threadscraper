@@ -4,6 +4,7 @@ import os
 import argparse
 import platform
 
+
 def main():
     parser = argparse.ArgumentParser()
 
@@ -58,7 +59,28 @@ def main():
         print(f'\tThread ID: {thread_id}')
         print(f'\tURL: {url}')
         print(f'\tContent URL: {content_url}')
-        print(f'\tYou will find the pictures in the following folder: {destination}')
+        print(f'\tYou will find the pictures in the following folder: {destination}\n')
+
+    # Create the destination folder
+    if verbose:
+        print(f'--> creating folder: {destination}')
+    try:
+        os.makedirs(destination, exist_ok=True)
+    except Exception as e:
+        if not quiet:
+            print(f'Could not create destination folder: {e}')
+        sys.exit(4)
+
+    # Get the thread in JSON-representation:
+    if verbose:
+        print(f'--> getting the thread metadata from thread id: {thread_id}')
+    resp = requests.get(url)
+    try:
+        resp.raise_for_status()
+    except Exception as exc:
+        if not quiet:
+            print(f'Could not get thread metadata, reason: {e}')
+        sys.exit(5)
 
 if __name__ == '__main__':
     main()
