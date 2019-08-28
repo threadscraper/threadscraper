@@ -56,13 +56,14 @@ def main():
     system = platform.system()
     if system == 'Linux':
         home = os.environ['HOME']
+        destination = f'{home}/{destination}'
     elif system == 'Windows':
         home == os.environ['HOMEPATH']
+        destination = f'{home}\{destination}'
     else:
         if not quiet:
             print('Unsupported system, exiting')
         sys.exit(2)
-    destination = f'{home}/{destination}'
 
     if verbose:
         print('Will scrape using the following information:')
