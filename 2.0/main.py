@@ -4,6 +4,7 @@ import os
 import argparse
 import platform
 import requests
+from datetime import datetime
 
 
 def main():
@@ -88,6 +89,21 @@ def main():
             print(f'Could not get thread metadata, reason: {e}')
         sys.exit(5)
 
+    # Provide more verbose information about the thread:
+    if verbose:
+        posts = resp.json()
+        first_post = posts['posts'][0]
+        title = first_post['sub']
+        no_of_images = first_post['images']
+        no_of_replies = first_post['replies']
+        time_of_first_post = datetime.utcfromtimestamp(first_post['time']).strftime('%Y-%m-%d %H:%M:%S')
+
+        print('--> metainformation about the thread:')
+        if title != '':
+            print(f'\tTitle: {title}')
+        print(f'\tNumber of images: {no_of_images}')
+        print(f'\tNumber of replies: {no_of_replies}')
+        print(f'\tTime of first post: {time_of_first_post} UTC')
 
 if __name__ == '__main__':
     main()
