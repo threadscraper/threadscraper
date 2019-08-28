@@ -3,17 +3,23 @@ import sys
 import os
 import argparse
 import platform
+import requests
 
 
 def main():
     parser = argparse.ArgumentParser()
 
     # parser.add_argument('', help='', type=str)
-    parser.add_argument('-q', '--quiet', help='Run the script in quiet mode, no outputs', action='store_true', default=False)
-    parser.add_argument('-v', '--verbose', help='Run with increased verbosity', action='store_true', default=False)
-    parser.add_argument('-w', '--watch', help='Watch the thread, will check thread every 5 minutes for new posts until thread 404s', action='store_true', default=False)
-    parser.add_argument('url', help='URL to the 4chan thread you want to scrape', type=str)
-    parser.add_argument('destination', help='Destination folder in your home folder', type=str)
+    parser.add_argument('-q', '--quiet', help='Run the script in quiet mode, no outputs',
+                        action='store_true', default=False)
+    parser.add_argument('-v', '--verbose', help='Run with increased verbosity',
+                        action='store_true', default=False)
+    parser.add_argument('-w', '--watch', help='Watch the thread, will check thread every 5 minutes for new posts until thread 404s',
+                        action='store_true', default=False)
+    parser.add_argument(
+        'url', help='URL to the 4chan thread you want to scrape', type=str)
+    parser.add_argument(
+        'destination', help='Destination folder in your home folder', type=str)
 
     args = parser.parse_args()
 
@@ -34,7 +40,6 @@ def main():
     url = f'https://a.4cdn.org/{board}/thread/{thread_id}.json'
     content_url = f'https://i.4cdn.org/{board}/'
 
-
     # Determine platform/OS and set appropriate path
     if not destination:
         if not quiet:
@@ -54,12 +59,13 @@ def main():
 
     if verbose:
         print('Will scrape using the following information:')
-        print(f'\tLink: {link}')
-        print(f'\tBoard: {board}')
-        print(f'\tThread ID: {thread_id}')
-        print(f'\tURL: {url}')
-        print(f'\tContent URL: {content_url}')
-        print(f'\tYou will find the pictures in the following folder: {destination}\n')
+        print(f'\tLink: \t\t{link}')
+        print(f'\tBoard: \t\t{board}')
+        print(f'\tThread ID: \t{thread_id}')
+        print(f'\tURL: \t\t{url}')
+        print(f'\tContent URL: \t{content_url}')
+        print(
+            f'\tDestination: \t{destination}\n')
 
     # Create the destination folder
     if verbose:
@@ -73,7 +79,7 @@ def main():
 
     # Get the thread in JSON-representation:
     if verbose:
-        print(f'--> getting the thread metadata from thread id: {thread_id}')
+        print(f'--> getting the thread metadata from thread id: {board}/{thread_id}')
     resp = requests.get(url)
     try:
         resp.raise_for_status()
@@ -81,6 +87,7 @@ def main():
         if not quiet:
             print(f'Could not get thread metadata, reason: {e}')
         sys.exit(5)
+
 
 if __name__ == '__main__':
     main()
