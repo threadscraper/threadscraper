@@ -34,7 +34,7 @@ def scraper(posts: list,
 
         for image in images:
             imageurl = content_url + image
-            target = destination + '/' + image
+            target = destination + image
 
             if not quiet:
                 print(f'\tDownloading: {imageurl}')

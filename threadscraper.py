@@ -40,9 +40,7 @@ def main():
     verbose = args.verbose
     quiet = args.quiet
     watch = args.watch
-    interval = 300
-    if args.interval:
-        interval = args.interval
+    interval = 300 if not args.interval else args.interval
 
     # Set variables
     link = args.url
@@ -56,10 +54,10 @@ def main():
     system = platform.system()
     if system == 'Linux':
         home = os.environ['HOME']
-        destination = f'{home}/{destination}'
+        destination = f'{home}/{destination}/'
     elif system == 'Windows':
         home == os.environ['HOMEPATH']
-        destination = f'{home}\{destination}'
+        destination = f'{home}\\{destination}\\'
     else:
         if not quiet:
             print('Unsupported system, exiting')
@@ -72,8 +70,9 @@ def main():
         print(f'\tThread ID: \t{thread_id}')
         print(f'\tURL: \t\t{url}')
         print(f'\tContent URL: \t{content_url}')
-        print(
-            f'\tDestination: \t{destination}\n')
+        print(f'\tDestination: \t{destination}\n')
+        if watch:
+            print(f'Will watch the thread. Interval: {interval}')
 
     # Create the destination folder
     if verbose:
