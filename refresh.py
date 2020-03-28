@@ -1,5 +1,6 @@
 import requests
 
+
 def refresh_post_list(url: str, quiet: bool, verbose: bool) -> list:
     resp = requests.get(url)
     posts = []

@@ -2,6 +2,9 @@
 import requests
 import time
 
+from datetime import timedelta
+from tqdm import tqdm
+
 
 def scraper(posts: list,
             start_time: int,
@@ -27,7 +30,9 @@ def scraper(posts: list,
     # If there are images to download:
     if images:
         if not quiet:
-            print(f'Starting download at: {time.ctime()}, it will take approx {len(images)} seconds')
+            # tests have shown it takes approx 1.5 sec per iteration, use as constant for time estimation
+            print(f'Starting download at: {time.ctime()}, it will take approx {timedelta(seconds=len(images)*1.5)}')
+            bar = tqdm(desc='Download progress', total=len(images))
 
         if verbose:
             print('--> downloading images with 1 second wait time')
@@ -37,7 +42,8 @@ def scraper(posts: list,
             target = destination + image
 
             if not quiet:
-                print(f'\tDownloading: {imageurl}')
+                bar.update()
+
             try:
                 r = requests.get(imageurl, stream=True)
                 downloaded_file = open(target, 'wb')

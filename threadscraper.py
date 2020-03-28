@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import argparse
 from datetime import datetime, timedelta
 import os
@@ -143,8 +142,6 @@ def main():
                 print('--> attempting to download new images')
             new_time = scraper(posts, new_time, content_url,
                                destination, quiet, verbose)
-
-    print('All images are downloaded, goodbye.')
 
 
 if __name__ == '__main__':
