@@ -14,7 +14,7 @@ def main():
 
     # Positional arguments
     parser.add_argument('url', help='URL to the 4chan thread you want to scrape', type=str)
-    parser.add_argument('destination', help='Destination folder in your home folder', type=str)
+    parser.add_argument('destination', help='Absolute path to target directory', type=str)
 
     # Optional arguments
     parser.add_argument('-q', '--quiet',
@@ -49,19 +49,19 @@ def main():
     url = f'https://a.4cdn.org/{board}/thread/{thread_id}.json'
     content_url = f'https://i.4cdn.org/{board}/'
 
-    # Determine platform/OS and set appropriate path
     system = platform.system()
     if system == 'Linux':
-        home = os.environ['HOME']
-        destination = f'{home}/{destination}/'
+        if not destination.endswith('/'):
+            destination = destination + '/'
     elif system == 'Windows':
-        home == os.environ['HOMEPATH']
-        destination = f'{home}\\{destination}\\'
+        if not destination.endswith('\\'):
+            destination = destination + '\\'
     else:
         if not quiet:
             print('Unsupported system, exiting')
         sys.exit(2)
-
+        
+    
     if verbose:
         print('Will scrape using the following information:')
         print(f'\tLink: \t\t{link}')
